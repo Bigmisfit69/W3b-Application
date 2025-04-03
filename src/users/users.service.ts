@@ -43,7 +43,7 @@ export class UserService {
     if(!isMatch){
       throw new HttpException('Invalid credentials', 400)
     }
-    delete user.password
+   
     
     const token = await this.jwtService.signAsync({id: user.id, email: user.email, role: user.role});
 
@@ -72,6 +72,9 @@ async logout(@Req() req: Request, @Res() res: Response) {
         let id = decoded["id"];
         let user = await this.userRepo.findOneBy({id});
 
+        if (!user) {
+          throw new UnauthorizedException('User not found');
+        }
         return {id: id, name: user.username, email: user.email, role: user.role};
       }catch(error){
         throw new UnauthorizedException('Invalid token');
